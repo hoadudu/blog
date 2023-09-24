@@ -6,7 +6,10 @@ import morgan from 'morgan';
 const app = express();
 const port = 1104;
 import route from './routes/index.js';
+import db from './config/db/index.js';
+import Cource from './app/models/Cource.js';
 
+db.connect();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dirPublic = path.join(__dirname, 'public');
@@ -39,8 +42,17 @@ app.set('views', viewFolder);
 
 route(app);
 
-app.get('/trang-chu', (req, res) => {
-    res.render('pages/home');
+app.get('/trang-chu', async (req, res) => {
+    try {
+        const allCourses = await Cource.find({});
+        res.json(allCourses);
+    } catch (err) {
+        // Xử lý lỗi nếu có
+        console.error(err);
+        res.status(500).send('Lỗi trong quá trình truy xuất dữ liệu.');
+    }
+
+    //res.render('pages/home');
 });
 
 app.listen(port, () => {
